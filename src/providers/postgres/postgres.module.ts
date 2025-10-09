@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { ConfigModule } from '../../config/config.module';
+import { IDatabaseConfig } from '../../config/interfaces/database-config.interface';
 
 @Module({
   imports: [
@@ -9,13 +10,15 @@ import { ConfigModule } from '../../config/config.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        const database = configService.get('database') as IDatabaseConfig;
+
         return {
           type: 'postgres',
-          host: configService.get('database.host'),
-          port: configService.get('database.port'),
-          username: configService.get('database.user'),
-          password: configService.get('database.password'),
-          database: configService.get('database.name'),
+          host: database.host,
+          port: database.port,
+          username: database.user,
+          password: database.password,
+          database: database.name,
           entities: ['dist/**/*.entity{.ts,.js}'],
           synchronize: true,
         };

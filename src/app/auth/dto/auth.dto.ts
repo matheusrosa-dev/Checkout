@@ -2,8 +2,17 @@ import { Expose } from 'class-transformer';
 
 export class AuthDto {
   @Expose()
-  name: string;
+  id: string;
 
   @Expose()
   email: string;
+
+  @Expose()
+  name: string;
+
+  @Expose()
+  accessToken: string;
+
+  @Expose()
+  refreshToken: string;
 }
