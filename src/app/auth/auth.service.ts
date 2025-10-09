@@ -31,7 +31,6 @@ export class AuthService {
     const tokens = await this.tokenService.generateOpaqueTokens(createdUser.id);
 
     return {
-      ...createdUser,
       ...tokens,
     };
   }
@@ -54,7 +53,6 @@ export class AuthService {
     const tokens = await this.tokenService.generateOpaqueTokens(foundUser.id);
 
     return {
-      ...foundUser,
       ...tokens,
     };
   }

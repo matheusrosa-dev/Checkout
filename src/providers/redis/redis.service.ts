@@ -17,4 +17,8 @@ export class RedisService {
   get(key: string) {
     return this.redis.get(key);
   }
+
+  delete(key: string) {
+    return this.redis.del(key);
+  }
 }

@@ -10,6 +10,8 @@ export class TokenService {
     const accessToken = crypto.randomBytes(32).toString('hex');
     const refreshToken = crypto.randomBytes(32).toString('hex');
 
+    await this.revokeTokensByUserId(userId);
+
     await this.setTokensInRedis({
       accessToken,
       refreshToken,
@@ -20,6 +22,27 @@ export class TokenService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async revokeTokensByUserId(userId: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.redisService.get(`userId:${userId}:accessToken`),
+      this.redisService.get(`userId:${userId}:refreshToken`),
+    ]);
+
+    if (accessToken) {
+      await Promise.all([
+        this.redisService.delete(`accessToken:${accessToken}`),
+        this.redisService.delete(`userId:${userId}:accessToken`),
+      ]);
+    }
+
+    if (refreshToken) {
+      await Promise.all([
+        this.redisService.delete(`refreshToken:${refreshToken}`),
+        this.redisService.delete(`userId:${userId}:refreshToken`),
+      ]);
+    }
   }
 
   private async setTokensInRedis(props: {
