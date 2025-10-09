@@ -2,9 +2,7 @@ import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
 import 'dotenv/config';
 
-import { IDatabaseConfig } from './interfaces/database-config.interface';
-import { IApiConfig } from './interfaces/api-config.interface';
-import { IRedisConfig } from './interfaces/redis-config.interface';
+import { IDatabaseConfig, IApiConfig, IRedisConfig } from './interfaces';
 
 export const apiConfig = registerAs<IApiConfig>('api', () => ({
   port: Number(process.env.API_PORT),

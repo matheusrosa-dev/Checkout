@@ -1,12 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { RegisterDto } from './dto/register.dto';
-import { UsersRepository } from '../users/repositories/users.repository';
+import { RegisterDto, LoginDto } from './dtos';
+import { UsersRepository } from '../users/repositories';
 import { TokensService } from './tokens.service';
-import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,9 +33,7 @@ export class AuthService {
       role: createdUser.role,
     });
 
-    return {
-      ...tokens,
-    };
+    return tokens;
   }
 
   async login(loginDto: LoginDto) {
@@ -58,8 +56,30 @@ export class AuthService {
       role: foundUser.role,
     });
 
-    return {
-      ...tokens,
-    };
+    return tokens;
+  }
+
+  async refreshSession(userId: string) {
+    const foundUser = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
+    await this.tokensService.revokeTokensByUserId(userId);
+
+    if (!foundUser) {
+      throw new ForbiddenException('Invalid session');
+    }
+
+    await this.tokensService.revokeTokensByUserId(userId);
+
+    const tokens = await this.tokensService.generateOpaqueTokens({
+      userId: foundUser.id,
+      role: foundUser.role,
+    });
+
+    return tokens;
+  }
+
+  async logout(userId: string) {
+    await this.tokensService.revokeTokensByUserId(userId);
   }
 }

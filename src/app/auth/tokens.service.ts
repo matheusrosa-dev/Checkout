@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RedisService } from '../../providers/redis/redis.service';
+import { RedisService } from '../../providers';
 import * as crypto from 'crypto';
 import { ISession } from './types';
 
@@ -33,7 +33,15 @@ export class TokensService {
     return JSON.parse(session) as ISession;
   }
 
-  private async revokeTokensByUserId(userId: string) {
+  async findUserIdByRefreshToken(refreshToken: string) {
+    const userId = await this.redisService.get(`refreshToken:${refreshToken}`);
+
+    if (!userId) return null;
+
+    return userId;
+  }
+
+  async revokeTokensByUserId(userId: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.redisService.get(`userId:${userId}:accessToken`),
       this.redisService.get(`userId:${userId}:refreshToken`),
@@ -82,7 +90,7 @@ export class TokensService {
       // Refresh Token
       this.redisService.set(
         `refreshToken:${refreshToken}`,
-        stringifiedSession,
+        session.userId,
         oneWeek,
       ),
       this.redisService.set(

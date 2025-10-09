@@ -1,4 +1,4 @@
-import { Role } from '../../users/enum/role.enum';
+import { Role } from '../../users/enums/role.enum';
 
 export interface ISession {
   userId: string;
