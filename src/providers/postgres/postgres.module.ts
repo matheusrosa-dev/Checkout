@@ -12,6 +12,8 @@ import { IDatabaseConfig } from '../../config/interfaces';
       useFactory: (configService: ConfigService) => {
         const database = configService.get('database') as IDatabaseConfig;
 
+        const isSeeding = process.env.NODE_ENV === 'seed';
+
         return {
           type: 'postgres',
           host: database.host,
@@ -19,7 +21,11 @@ import { IDatabaseConfig } from '../../config/interfaces';
           username: database.user,
           password: database.password,
           database: database.name,
-          entities: ['dist/**/*.entity{.ts,.js}'],
+          entities: [
+            isSeeding
+              ? 'src/**/*.entity{.ts,.js}'
+              : 'dist/**/*.entity{.ts,.js}',
+          ],
           synchronize: true,
         };
       },
