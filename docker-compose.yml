@@ -1,0 +1,12 @@
+services:
+  postgres:
+    container_name: checkout-db
+    env_file:
+      - .env
+    image: postgres:18
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
