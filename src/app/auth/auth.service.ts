@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { UsersRepository } from '../users/repositories/users.repository';
-import { TokenService } from './token.service';
+import { TokensService } from './tokens.service';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersRepository: UsersRepository,
-    private tokenService: TokenService,
+    private tokensService: TokensService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -28,7 +28,10 @@ export class AuthService {
 
     await this.usersRepository.save(createdUser);
 
-    const tokens = await this.tokenService.generateOpaqueTokens(createdUser.id);
+    const tokens = await this.tokensService.generateOpaqueTokens({
+      userId: createdUser.id,
+      role: createdUser.role,
+    });
 
     return {
       ...tokens,
@@ -50,7 +53,10 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    const tokens = await this.tokenService.generateOpaqueTokens(foundUser.id);
+    const tokens = await this.tokensService.generateOpaqueTokens({
+      userId: foundUser.id,
+      role: foundUser.role,
+    });
 
     return {
       ...tokens,

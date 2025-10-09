@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from '../../providers/redis/redis.service';
 import * as crypto from 'crypto';
+import { ISession } from './types';
 
 @Injectable()
-export class TokenService {
+export class TokensService {
   constructor(private redisService: RedisService) {}
 
-  async generateOpaqueTokens(userId: string) {
+  async generateOpaqueTokens(session: ISession) {
     const accessToken = crypto.randomBytes(32).toString('hex');
     const refreshToken = crypto.randomBytes(32).toString('hex');
 
-    await this.revokeTokensByUserId(userId);
+    await this.revokeTokensByUserId(session.userId);
 
     await this.setTokensInRedis({
       accessToken,
       refreshToken,
-      userId,
+      session,
     });
 
     return {
@@ -24,7 +25,15 @@ export class TokenService {
     };
   }
 
-  async revokeTokensByUserId(userId: string) {
+  async findSessionByAccessToken(accessToken: string) {
+    const session = await this.redisService.get(`accessToken:${accessToken}`);
+
+    if (!session) return null;
+
+    return JSON.parse(session) as ISession;
+  }
+
+  private async revokeTokensByUserId(userId: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.redisService.get(`userId:${userId}:accessToken`),
       this.redisService.get(`userId:${userId}:refreshToken`),
@@ -46,32 +55,38 @@ export class TokenService {
   }
 
   private async setTokensInRedis(props: {
-    userId: string;
+    session: ISession;
     accessToken: string;
     refreshToken: string;
   }) {
-    const { userId, accessToken, refreshToken } = props;
+    const { session, accessToken, refreshToken } = props;
 
     const fifteenMinutes = 15 * 60;
     const oneWeek = 7 * 24 * 60 * 60;
+
+    const stringifiedSession = JSON.stringify(session);
 
     await Promise.all([
       // Access Token
       this.redisService.set(
         `accessToken:${accessToken}`,
-        userId,
+        stringifiedSession,
         fifteenMinutes,
       ),
       this.redisService.set(
-        `userId:${userId}:accessToken`,
+        `userId:${session.userId}:accessToken`,
         accessToken,
         fifteenMinutes,
       ),
 
       // Refresh Token
-      this.redisService.set(`refreshToken:${refreshToken}`, userId, oneWeek),
       this.redisService.set(
-        `userId:${userId}:refreshToken`,
+        `refreshToken:${refreshToken}`,
+        stringifiedSession,
+        oneWeek,
+      ),
+      this.redisService.set(
+        `userId:${session.userId}:refreshToken`,
         refreshToken,
         oneWeek,
       ),

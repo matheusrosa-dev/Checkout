@@ -3,11 +3,11 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { RedisModule } from '../../providers/redis/redis.module';
-import { TokenService } from './token.service';
+import { TokensService } from './tokens.service';
 
 @Module({
   imports: [UsersModule, RedisModule],
   controllers: [AuthController],
-  providers: [AuthService, TokenService],
+  providers: [AuthService, TokensService],
 })
 export class AuthModule {}

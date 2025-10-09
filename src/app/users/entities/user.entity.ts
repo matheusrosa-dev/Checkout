@@ -6,6 +6,7 @@ import {
   Unique,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Role } from '../enum/role.enum';
 
 @Entity('users')
 @Unique(['email'])
@@ -13,19 +14,16 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({
-    nullable: false,
-    length: 50,
-  })
+  @Column({ length: 50 })
   name: string;
 
-  @Column({
-    nullable: false,
-    length: 50,
-  })
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
+
+  @Column({ length: 50 })
   email: string;
 
-  @Column({ nullable: false })
+  @Column()
   password: string;
 
   @BeforeInsert()
