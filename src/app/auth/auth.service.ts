@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './dtos';
 import { UsersRepository } from '../users/repositories';
-import { TokensService } from './tokens.service';
+import { AuthTokensService } from '../../providers/redis/auth-tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersRepository: UsersRepository,
-    private tokensService: TokensService,
+    private authTokensService: AuthTokensService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -28,7 +28,7 @@ export class AuthService {
 
     await this.usersRepository.save(createdUser);
 
-    const tokens = await this.tokensService.generateOpaqueTokens({
+    const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: createdUser.id,
       role: createdUser.role,
     });
@@ -51,7 +51,7 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    const tokens = await this.tokensService.generateOpaqueTokens({
+    const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: foundUser.id,
       role: foundUser.role,
     });
@@ -63,15 +63,15 @@ export class AuthService {
     const foundUser = await this.usersRepository.findOne({
       where: { id: userId },
     });
-    await this.tokensService.revokeTokensByUserId(userId);
+    await this.authTokensService.revokeTokensByUserId(userId);
 
     if (!foundUser) {
       throw new ForbiddenException('Invalid session');
     }
 
-    await this.tokensService.revokeTokensByUserId(userId);
+    await this.authTokensService.revokeTokensByUserId(userId);
 
-    const tokens = await this.tokensService.generateOpaqueTokens({
+    const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: foundUser.id,
       role: foundUser.role,
     });
@@ -80,6 +80,6 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    await this.tokensService.revokeTokensByUserId(userId);
+    await this.authTokensService.revokeTokensByUserId(userId);
   }
 }

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { RedisService } from '../../providers';
 import * as crypto from 'crypto';
-import { ISession } from './types';
+import { ISession } from '../../app/auth/types';
+import { RedisService } from './redis.service';
 
 @Injectable()
-export class TokensService {
+export class AuthTokensService {
   constructor(private redisService: RedisService) {}
 
   async generateOpaqueTokens(session: ISession) {

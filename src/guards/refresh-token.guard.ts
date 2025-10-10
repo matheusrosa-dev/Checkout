@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { TokensService } from '../tokens.service';
+import { AuthTokensService } from '../providers/redis/auth-tokens.service';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
-  constructor(private readonly tokensService: TokensService) {}
+  constructor(private readonly authTokensService: AuthTokensService) {}
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
@@ -14,7 +14,7 @@ export class RefreshTokenGuard implements CanActivate {
     const refreshToken = authHeader.split(' ')[1];
 
     const userId =
-      await this.tokensService.findUserIdByRefreshToken(refreshToken);
+      await this.authTokensService.findUserIdByRefreshToken(refreshToken);
 
     if (!userId) return false;
 
