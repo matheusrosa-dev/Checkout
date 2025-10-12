@@ -1,7 +1,14 @@
-import { BeforeInsert, Column, Entity, Unique } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  Unique,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Role } from '../enums';
 import { BaseEntity } from '../../../common/entities';
+import { Role } from './role.entity';
 
 @Entity('users')
 @Unique(['email'])
@@ -9,7 +16,8 @@ export class User extends BaseEntity<User> {
   @Column({ length: 50 })
   name: string;
 
-  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  @JoinColumn({ name: 'role_id' })
   role: Role;
 
   @Column({ length: 50 })

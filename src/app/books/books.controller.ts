@@ -12,8 +12,8 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Serialize } from '../../interceptors/serialize.interceptor';
 import { BookDto } from './dto/book.dto';
-import { Role } from '../users/enums';
-import { Roles } from '../../decorators';
+import { AllowedRoles } from '../../decorators';
+import { Roles } from '../users/enums';
 
 @Controller('books')
 @Serialize(BookDto)
@@ -26,7 +26,7 @@ export class BooksController {
   }
 
   @Get()
-  @Roles([Role.ADMIN])
+  @AllowedRoles([Roles.ADMIN])
   findAll() {
     return this.booksService.findAll();
   }

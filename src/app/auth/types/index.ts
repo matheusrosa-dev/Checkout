@@ -1,6 +1,6 @@
-import { Role } from '../../users/enums/role.enum';
+import { Roles } from '../../users/enums';
 
 export interface ISession {
   userId: string;
-  role: Role;
+  role: Roles;
 }

@@ -1,31 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
-import { UsersRepository } from '../app/users/repositories';
-import { Role } from '../app/users/enums';
+import { RolesRepository, UsersRepository } from '../app/users/repositories';
+import { Roles } from '../app/users/enums';
+import { seedRoles } from './roles';
+import { seedUsers } from './users';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule, {
     logger: false,
   });
-  const usersRepository = app.get(UsersRepository);
 
-  const adminExists = await usersRepository.findOne({
-    where: { email: 'admin@email.com' },
+  const usersRepository = app.get(UsersRepository);
+  const rolesRepository = app.get(RolesRepository);
+
+  await seedRoles(rolesRepository);
+
+  const adminRole = await rolesRepository.findOne({
+    where: { name: Roles.ADMIN },
   });
 
-  if (!adminExists) {
-    const admin = usersRepository.create({
-      name: 'Admin',
-      email: 'admin@email.com',
-      password: '12345Aa',
-      role: Role.ADMIN,
-    });
-
-    await usersRepository.save(admin);
-    console.log('✅  Usuário admin criado');
-  } else {
-    console.log('ℹ️  Usuário admin já existe');
-  }
+  await seedUsers({
+    adminRole: adminRole!,
+    usersRepository,
+  });
 
   await app.close();
   process.exit(0);

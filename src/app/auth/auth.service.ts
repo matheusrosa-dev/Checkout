@@ -5,13 +5,14 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './dtos';
-import { UsersRepository } from '../users/repositories';
+import { RolesRepository, UsersRepository } from '../users/repositories';
 import { AuthTokensService } from '../../providers/redis/auth-tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersRepository: UsersRepository,
+    private rolesRepository: RolesRepository,
     private authTokensService: AuthTokensService,
   ) {}
 
@@ -30,7 +31,7 @@ export class AuthService {
 
     const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: createdUser.id,
-      role: createdUser.role,
+      role: createdUser.role.name,
     });
 
     return tokens;
@@ -53,7 +54,7 @@ export class AuthService {
 
     const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: foundUser.id,
-      role: foundUser.role,
+      role: foundUser.role.name,
     });
 
     return tokens;
@@ -73,7 +74,7 @@ export class AuthService {
 
     const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: foundUser.id,
-      role: foundUser.role,
+      role: foundUser.role.name,
     });
 
     return tokens;

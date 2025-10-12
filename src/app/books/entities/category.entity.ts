@@ -11,6 +11,6 @@ export class Category extends BaseEntity<Category> {
     cascade: true,
     onDelete: 'RESTRICT',
   })
-  @JoinTable()
+  @JoinTable({ name: 'books_categories' })
   books: Book[];
 }
