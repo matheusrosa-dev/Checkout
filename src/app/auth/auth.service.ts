@@ -7,6 +7,7 @@ import {
 import { RegisterDto, LoginDto } from './dtos';
 import { RolesRepository, UsersRepository } from '../users/repositories';
 import { AuthTokensService } from '../../providers/redis/auth-tokens.service';
+import { Roles } from '../users/enums';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,14 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    const createdUser = this.usersRepository.create(registerDto);
+    const userRole = await this.rolesRepository.findOne({
+      where: { name: Roles.USER },
+    });
+
+    const createdUser = this.usersRepository.create({
+      ...registerDto,
+      role: userRole!,
+    });
 
     await this.usersRepository.save(createdUser);
 
