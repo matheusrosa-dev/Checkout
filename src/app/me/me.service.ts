@@ -6,7 +6,9 @@ export class MeService {
   constructor(private usersRepository: UsersRepository) {}
 
   async findMe(userId: string) {
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
 
     if (!user) throw new ForbiddenException('Your session is invalid');
 

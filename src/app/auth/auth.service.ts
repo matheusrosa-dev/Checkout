@@ -46,9 +46,10 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const foundUser = await this.usersRepository.findOne({
-      where: { email: loginDto.email },
-    });
+    const foundUser = await this.usersRepository.findByFieldWithRole(
+      'email',
+      loginDto.email,
+    );
 
     if (!foundUser) {
       throw new BadRequestException('Invalid credentials');
@@ -69,9 +70,10 @@ export class AuthService {
   }
 
   async refreshSession(userId: string) {
-    const foundUser = await this.usersRepository.findOne({
-      where: { id: userId },
-    });
+    const foundUser = await this.usersRepository.findByFieldWithRole(
+      'id',
+      userId,
+    );
     await this.authTokensService.revokeTokensByUserId(userId);
 
     if (!foundUser) {
