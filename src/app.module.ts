@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
 import { PostgresModule } from './providers/postgres/postgres.module';
-import { AuthModule, UsersModule, BooksModule } from './app';
+import { AuthModule, UsersModule, BooksModule, MeModule } from './app';
 import { RedisModule } from './providers/redis/redis.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard, RolesGuard } from './guards';
@@ -14,6 +14,7 @@ import { AccessTokenGuard, RolesGuard } from './guards';
     UsersModule,
     AuthModule,
     BooksModule,
+    MeModule,
   ],
   providers: [
     {
