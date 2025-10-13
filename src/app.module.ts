@@ -4,7 +4,7 @@ import { PostgresModule } from './providers/postgres/postgres.module';
 import { AuthModule, UsersModule, BooksModule, MeModule } from './app';
 import { RedisModule } from './providers/redis/redis.module';
 import { APP_GUARD } from '@nestjs/core';
-import { AccessTokenGuard, RolesGuard } from './guards';
+import { AuthGuard, RolesGuard } from './guards';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { AccessTokenGuard, RolesGuard } from './guards';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AccessTokenGuard,
+      useClass: AuthGuard,
     },
     {
       provide: APP_GUARD,

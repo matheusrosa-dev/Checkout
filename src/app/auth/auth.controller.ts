@@ -2,10 +2,8 @@ import {
   Controller,
   Post,
   Body,
-  UseGuards,
   HttpStatus,
   HttpCode,
-  Req,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -13,7 +11,6 @@ import { Serialize } from '../../interceptors/serialize.interceptor';
 import { LoginDto, AuthDto, RegisterDto } from './dtos';
 import type { ISession } from './types';
 import { CurrentSession, Public } from '../../decorators';
-import { RefreshTokenGuard } from '../../guards';
 import type { Response } from 'express';
 
 @Controller('auth')
@@ -39,15 +36,6 @@ export class AuthController {
     this.setAuthTokensCookie({ res, tokens });
 
     return res.send();
-  }
-
-  @Post('refresh-session')
-  @Public()
-  @UseGuards(RefreshTokenGuard)
-  async refreshSession(@Req() req: { userId: string }, @Res() res: Response) {
-    const tokens = await this.authService.refreshSession(req.userId);
-
-    this.setAuthTokensCookie({ res, tokens });
   }
 
   @Post('logout')

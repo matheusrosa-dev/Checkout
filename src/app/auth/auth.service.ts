@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
 } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './dtos';
@@ -60,27 +59,6 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid credentials');
     }
-
-    const tokens = await this.authTokensService.generateOpaqueTokens({
-      userId: foundUser.id,
-      role: foundUser.role.name,
-    });
-
-    return tokens;
-  }
-
-  async refreshSession(userId: string) {
-    const foundUser = await this.usersRepository.findByFieldWithRole(
-      'id',
-      userId,
-    );
-    await this.authTokensService.revokeTokensByUserId(userId);
-
-    if (!foundUser) {
-      throw new ForbiddenException('Invalid session');
-    }
-
-    await this.authTokensService.revokeTokensByUserId(userId);
 
     const tokens = await this.authTokensService.generateOpaqueTokens({
       userId: foundUser.id,

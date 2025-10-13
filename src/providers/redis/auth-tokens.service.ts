@@ -33,12 +33,12 @@ export class AuthTokensService {
     return JSON.parse(session) as ISession;
   }
 
-  async findUserIdByRefreshToken(refreshToken: string) {
-    const userId = await this.redisService.get(`refreshToken:${refreshToken}`);
+  async findSessionByRefreshToken(refreshToken: string) {
+    const session = await this.redisService.get(`refreshToken:${refreshToken}`);
 
-    if (!userId) return null;
+    if (!session) return null;
 
-    return userId;
+    return JSON.parse(session) as ISession;
   }
 
   async revokeTokensByUserId(userId: string) {
@@ -90,7 +90,7 @@ export class AuthTokensService {
       // Refresh Token
       this.redisService.set(
         `refreshToken:${refreshToken}`,
-        session.userId,
+        stringifiedSession,
         oneWeek,
       ),
       this.redisService.set(
