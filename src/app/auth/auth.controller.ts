@@ -52,8 +52,12 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  logout(@CurrentSession() session: ISession) {
-    return this.authService.logout(session.userId);
+  async logout(@CurrentSession() session: ISession, @Res() res: Response) {
+    await this.authService.logout(session.userId);
+
+    this.destroyAuthTokensCookie(res);
+
+    return res.send();
   }
 
   setAuthTokensCookie(props: {
@@ -64,19 +68,17 @@ export class AuthController {
 
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
-      sameSite: 'strict',
     });
 
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
-      sameSite: 'strict',
     });
 
     return res.send();
   }
 
   destroyAuthTokensCookie(res: Response) {
-    res.clearCookie('access_token', { httpOnly: true, sameSite: 'strict' });
-    res.clearCookie('refresh_token', { httpOnly: true, sameSite: 'strict' });
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
   }
 }

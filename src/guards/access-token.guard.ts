@@ -18,11 +18,9 @@ export class AccessTokenGuard implements CanActivate {
     if (isPublic) return true;
 
     const req = context.switchToHttp().getRequest();
-    const authHeader = req.headers['authorization'];
+    const accessToken = req?.cookies?.access_token as string | undefined;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) return false;
-
-    const accessToken = authHeader.split(' ')[1];
+    if (!accessToken) return false;
 
     const session =
       await this.authTokensService.findSessionByAccessToken(accessToken);

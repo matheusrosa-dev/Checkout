@@ -7,11 +7,10 @@ export class RefreshTokenGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
-    const authHeader = req.headers['authorization'];
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) return false;
+    const refreshToken = req?.cookies?.refresh_token as string | undefined;
 
-    const refreshToken = authHeader.split(' ')[1];
+    if (!refreshToken) return false;
 
     const userId =
       await this.authTokensService.findUserIdByRefreshToken(refreshToken);
