@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:18
-    container_name: checkout-db
+    container_name: books-db
     env_file:
       - .env
     ports:
@@ -13,6 +13,6 @@ services:
 
   redis:
     image: redis:7
-    container_name: checkout-redis
+    container_name: books-redis
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}

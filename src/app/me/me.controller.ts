@@ -13,6 +13,5 @@ export class MeController {
   @Get()
   findOne(@CurrentSession() session: ISession) {
     return this.meService.findMe(session.userId);
-    return {};
   }
 }

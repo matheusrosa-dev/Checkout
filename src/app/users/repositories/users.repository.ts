@@ -11,12 +11,4 @@ export class UsersRepository extends BaseRepository<User> {
   ) {
     super(repository.target, repository.manager, repository.queryRunner);
   }
-
-  findByFieldWithRole(field: 'id' | 'email', value: string) {
-    return this.repository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.role', 'role')
-      .where(`user.${field} = :value`, { value })
-      .getOne();
-  }
 }

@@ -45,10 +45,9 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const foundUser = await this.usersRepository.findByFieldWithRole(
-      'email',
-      loginDto.email,
-    );
+    const foundUser = await this.usersRepository.findOne({
+      where: { email: loginDto.email },
+    });
 
     if (!foundUser) {
       throw new BadRequestException('Invalid credentials');

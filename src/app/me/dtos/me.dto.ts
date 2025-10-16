@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 
 export class MeDto {
   @Expose()
@@ -6,6 +6,10 @@ export class MeDto {
 
   @Expose()
   name: string;
+
+  @Expose()
+  @Transform(({ obj }) => obj.role.name)
+  role: string;
 
   @Expose()
   email: string;

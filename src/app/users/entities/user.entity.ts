@@ -16,7 +16,7 @@ export class User extends BaseEntity<User> {
   @Column({ length: 50 })
   name: string;
 
-  @ManyToOne(() => Role, (role) => role.users)
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
   @JoinColumn({ name: 'role_id' })
   role: Role;
 
